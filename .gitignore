@@ -1,0 +1,10 @@
+.gradle/
+reports/
+
+lib/
+
+**/build/
+**/private/
+**/*.iml
+**/*.idea
+**/target
