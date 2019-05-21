@@ -26,6 +26,6 @@
 Run already created fat-jar
 
 ```
-java -jar build/libs/Luxoft-all.jar
+java -jar build/libs/sensors-all.jar
 ```
 
