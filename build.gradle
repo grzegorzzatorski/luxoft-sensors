@@ -28,10 +28,18 @@ project.ext.mainClass = "pl.gzatorski.sensors.Launcher"
 jar {
   manifest { attributes 'Main-Class': project.ext.mainClass }
 }
- 
+
+shadowJar {
+  manifest {
+    attributes 'Main-Class': project.ext.mainClass
+  }
+  mergeServiceFiles('reference.conf')
+}
 
 dependencies {
     compile 'org.scala-lang:scala-library:2.11.8'
+    compile 'com.typesafe.akka:akka-actor_2.11:2.4.6'
+    compile 'com.typesafe.akka:akka-testkit_2.11:2.4.6'
     testCompile 'org.scalatest:scalatest_2.11:3.0.4'
     testRuntime 'org.pegdown:pegdown:1.4.2'
     testRuntime 'org.scala-lang.modules:scala-xml_2.11:1.0.6'
