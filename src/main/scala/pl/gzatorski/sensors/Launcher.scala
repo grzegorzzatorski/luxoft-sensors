@@ -4,6 +4,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.util.Timeout
 import scala.concurrent.duration._
 import akka.pattern.ask
+import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
 object Launcher {
@@ -26,7 +27,7 @@ object Launcher {
             //TODO: Aggregate data
           }
         }
-
+        Await.result(Future.sequence(futures), 10.minutes)
         system.terminate()
       case Failure(n) =>
         println(s"$n\n $usage")

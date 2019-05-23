@@ -12,4 +12,19 @@ object Utils {
     }
 
   }
+
+  def min(first: Option[Int], second: Option[Int]): Option[Int] = (first, second) match {
+    case (Some(a), Some(b)) => if (a < b) Some(a) else Some(b)
+    case (None, None)       => None
+    case (None, b)          => b
+    case (a, None)          => a
+  }
+
+  def max(first: Option[Int], second: Option[Int]): Option[Int] = (first, second) match {
+    case (Some(a), Some(b)) => if (a > b) Some(a) else Some(b)
+    case (None, None)       => None
+    case (None, b)          => b
+    case (a, None)          => a
+  }
+  
 }
