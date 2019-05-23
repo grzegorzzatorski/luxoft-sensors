@@ -18,7 +18,7 @@ object Launcher {
         implicit val timeout = Timeout(60 seconds)
         val futures = ReportFileReader.getReportFilesPaths(dataDir).map { file =>
           println(s"Staring to process ${file.getName}")
-          val actor = system.actorOf(Props(new StatisticCounterActor(file.getAbsolutePath)))
+          val actor = system.actorOf(Props(new FileActor(file.getAbsolutePath)))
           actor ? ProcessFile()
         }
 

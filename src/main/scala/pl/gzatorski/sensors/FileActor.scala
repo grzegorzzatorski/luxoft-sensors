@@ -7,7 +7,7 @@ case class ProcessFile()
 
 case class Measurement(sensorId: String, humidity: Option[Int] = None)
 
-class StatisticCounterActor(filepath: String) extends Actor {
+class FileActor(filepath: String) extends Actor {
   var dataRequester: Option[ActorRef] = None
   var workers = scala.collection.mutable.Map.empty[String, ActorRef]
   var partialComputations = new scala.collection.mutable.ListBuffer[ComputationResult]

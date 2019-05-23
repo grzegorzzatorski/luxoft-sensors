@@ -10,7 +10,7 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import akka.pattern.ask
 import akka.util.Timeout
 
-class StatisticCounterActorSpec extends TestKit(ActorSystem("StatisticSensorSpec"))
+class FileActorSpec extends TestKit(ActorSystem("StatisticSensorSpec"))
   with ImplicitSender
   with WordSpecLike
   with Matchers
@@ -25,7 +25,7 @@ class StatisticCounterActorSpec extends TestKit(ActorSystem("StatisticSensorSpec
   "StatisticCounterActorSpec actor" must {
 
     "return a list of aggregated data located in one file" in {
-      val actor = TestActorRef(new StatisticCounterActor(s"$dirFilePath/leader-1.csv"))
+      val actor = TestActorRef(new FileActor(s"$dirFilePath/leader-1.csv"))
       implicit val timeout = Timeout(60 seconds)
       val future = actor ? ProcessFile()
       
