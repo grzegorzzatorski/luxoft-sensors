@@ -1,6 +1,6 @@
 package pl.gzatorski.sensors
 
-import akka.actor.Actor
+import akka.actor.{Actor, Stash}
 
 
 case class ProcessSingleMeasurement(measurement: Measurement)
@@ -16,34 +16,45 @@ case class PartialComputation(value: ComputationResult)
 
 case class FinishProcessing()
 
-class SensorActor extends Actor {
+class SensorActor extends Actor with Stash {
   var minHumidity: Option[Int] = None
   var maxHumidity: Option[Int] = None
   var sumHumidity: Long = 0
   var numOfMeasurements: Long = 0
   var numOfFailed: Long = 0
-  var name = ""
 
   def receive: Receive = {
-    case ProcessSingleMeasurement(measurement) => {
-      name = measurement.sensorId
-      minHumidity = Utils.min(measurement.humidity, minHumidity)
-      maxHumidity = Utils.max(measurement.humidity, maxHumidity)
-      
-      measurement.humidity.foreach { current =>
-        sumHumidity += current
-        numOfMeasurements += 1
-      }
+    case ProcessSingleMeasurement(measurement) =>
+      updateStatisctics(measurement)
+      unstashAll()
+      context become initialized(measurement.sensorId)
+    case _ => stash()
+  }
 
-      if (measurement.humidity.isEmpty) {
-        numOfFailed += 1
-      }
+  def initialized(sensorId: String): Receive = {
+    case ProcessSingleMeasurement(measurement) => {
+      updateStatisctics(measurement)
     }
-      
+
     case FinishProcessing() => {
-      val partial = ComputationResult(name, minHumidity, maxHumidity, sumHumidity, numOfMeasurements, numOfFailed)
+      val partial = ComputationResult(sensorId, minHumidity, maxHumidity, sumHumidity, numOfMeasurements, numOfFailed)
       sender ! PartialComputation(partial)
     }
     case _ => println("Message unknown")
   }
+  
+  private def updateStatisctics(measurement: Measurement) = {
+    minHumidity = Utils.min(measurement.humidity, minHumidity)
+    maxHumidity = Utils.max(measurement.humidity, maxHumidity)
+
+    measurement.humidity.foreach { current =>
+      sumHumidity += current
+      numOfMeasurements += 1
+    }
+
+    if (measurement.humidity.isEmpty) {
+      numOfFailed += 1
+    }
+  }
+
 }
