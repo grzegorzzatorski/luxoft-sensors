@@ -11,7 +11,7 @@ class ReportFileReaderSpec extends Matchers with WordSpecLike {
 
     "list csv files only" in {
       val files = ReportFileReader.getReportFilesPaths(dirFilePath).map { file => file.getName }
-      files should equal(List("leader-1.csv", "leader-2.csv"))
+      files.toSet should equal(List("leader-1.csv", "leader-2.csv").toSet)
     }
 
     "return empty list when directory no exists" in {
