@@ -9,24 +9,27 @@ import scala.util.{Failure, Success}
 
 object Launcher {
   val usage = "Usage: java -jar sensors-all.jar [path to directory]\n"
+
   def main(args: Array[String]): Unit = {
-    
+
     Utils.parseDirectory(args) match {
       case Success(dataDir) =>
         val system = ActorSystem("System")
         implicit val executionContext = system.dispatcher
         implicit val timeout = Timeout(60 seconds)
+
         val futures = ReportFileReader.getReportFilesPaths(dataDir).map { file =>
-          println(s"Staring to process ${file.getName}")
           val actor = system.actorOf(Props(new FileActor(file.getAbsolutePath)))
-          actor ? ProcessFile()
+          (actor ? ProcessFile()).mapTo[List[ComputationResult]]
         }
 
-        futures.map { future =>
-          future.map { result =>
-            //TODO: Aggregate data
-          }
+        val futuresAggregates = Future.sequence(futures).map(_.flatten)
+
+        futuresAggregates.onComplete {
+          case Success(results) => //TODO: Pass aggregated data further
+          case Failure(e) => println(s"Something goes wrong: ${e.getMessage}")
         }
+        
         Await.result(Future.sequence(futures), 10.minutes)
         system.terminate()
       case Failure(n) =>
