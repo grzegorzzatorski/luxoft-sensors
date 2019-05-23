@@ -1,9 +1,12 @@
 package pl.gzatorski.sensors
 
 import akka.actor.{Actor, Stash}
+import pl.gzatorski.sensors.Utils._
 
 
 case class ProcessSingleMeasurement(measurement: Measurement)
+
+case class GetStatistics()
 
 case class ComputationResult(sensorName: String,
                              minHumidity: Option[Int],
@@ -14,7 +17,6 @@ case class ComputationResult(sensorName: String,
 
 case class PartialComputation(value: ComputationResult)
 
-case class FinishProcessing()
 
 class SensorActor extends Actor with Stash {
   var minHumidity: Option[Int] = None
@@ -25,27 +27,23 @@ class SensorActor extends Actor with Stash {
 
   def receive: Receive = {
     case ProcessSingleMeasurement(measurement) =>
-      updateStatisctics(measurement)
+      updateStatistics(measurement)
       unstashAll()
       context become initialized(measurement.sensorId)
     case _ => stash()
   }
 
   def initialized(sensorId: String): Receive = {
-    case ProcessSingleMeasurement(measurement) => {
-      updateStatisctics(measurement)
-    }
-
-    case FinishProcessing() => {
+    case ProcessSingleMeasurement(measurement) => updateStatistics(measurement)
+    case GetStatistics() =>
       val partial = ComputationResult(sensorId, minHumidity, maxHumidity, sumHumidity, numOfMeasurements, numOfFailed)
       sender ! PartialComputation(partial)
-    }
-    case _ => println("Message unknown")
+    case _ => println(s"Sensor $sensorId actor: Message unknown")
   }
-  
-  private def updateStatisctics(measurement: Measurement) = {
-    minHumidity = Utils.min(measurement.humidity, minHumidity)
-    maxHumidity = Utils.max(measurement.humidity, maxHumidity)
+
+  private def updateStatistics(measurement: Measurement) = {
+    minHumidity = min(measurement.humidity, minHumidity)
+    maxHumidity = max(measurement.humidity, maxHumidity)
 
     measurement.humidity.foreach { current =>
       sumHumidity += current

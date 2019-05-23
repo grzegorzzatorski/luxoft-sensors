@@ -19,7 +19,7 @@ class SensorActorSpec extends TestKit(ActorSystem("SensorSpec"))
     "handle single result" in {
       val actor = TestActorRef[SensorActor]
       actor ! ProcessSingleMeasurement(Measurement("s1", Some(50)))
-      actor ! FinishProcessing()
+      actor ! GetStatistics()
 
       expectMsg(PartialComputation(ComputationResult("s1", Some(50), Some(50), 50, 1, 0)))
     }
@@ -27,7 +27,7 @@ class SensorActorSpec extends TestKit(ActorSystem("SensorSpec"))
     "handle NaN as Nones" in {
       val actor = TestActorRef[SensorActor]
       actor ! ProcessSingleMeasurement(Measurement("s1", None))
-      actor ! FinishProcessing()
+      actor ! GetStatistics()
 
       expectMsg(PartialComputation(ComputationResult("s1", None, None, 0, 0, 1)))
     }
@@ -38,7 +38,7 @@ class SensorActorSpec extends TestKit(ActorSystem("SensorSpec"))
       actor ! ProcessSingleMeasurement(Measurement("s1", Some(10)))
       actor ! ProcessSingleMeasurement(Measurement("s1", Some(15)))
 
-      actor ! FinishProcessing()
+      actor ! GetStatistics()
 
       expectMsg(PartialComputation(ComputationResult("s1", Some(5), Some(15), 30, 3, 0)))
     }
@@ -52,7 +52,7 @@ class SensorActorSpec extends TestKit(ActorSystem("SensorSpec"))
       actor ! ProcessSingleMeasurement(Measurement("s1", Some(9)))
       actor ! ProcessSingleMeasurement(Measurement("s1", None))
       
-      actor ! FinishProcessing()
+      actor ! GetStatistics()
 
       expectMsg(PartialComputation(ComputationResult("s1", Some(0), Some(100), 109, 3, 3)))
     }
