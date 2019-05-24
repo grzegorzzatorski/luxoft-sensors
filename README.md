@@ -58,3 +58,26 @@ s11,0,45,101
 
 ```
 
+## Profiling
+
+
+Memory test was performed on couple of files that exceed amount of app memory:
+
+```
+gzatorski@debian:~/Dokumenty/Github/luxoft-sensors/test/data$ du -hs *
+65M	leader-13.csv
+129M	leader-14.csv
+...
+```
+
+App was run with `-Xmx64m`:
+
+```
+java -jar -Xmx64m build/libs/sensors-all.jar test/data/
+
+```
+
+![JProfiler1](profiling/jprofiler.PNG)
+![JProfiler2](profiling/jprofiler2.PNG)
+
+
