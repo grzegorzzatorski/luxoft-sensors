@@ -19,11 +19,11 @@ case class PartialComputation(value: ComputationResult)
 
 
 class SensorActor extends Actor with Stash {
-  var minHumidity: Option[Int] = None
-  var maxHumidity: Option[Int] = None
-  var sumHumidity: Long = 0
-  var numOfMeasurements: Long = 0
-  var numOfFailed: Long = 0
+  private var minHumidity: Option[Int] = None
+  private var maxHumidity: Option[Int] = None
+  private var sumHumidity: Long = 0
+  private var numOfMeasurements: Long = 0
+  private var numOfFailed: Long = 0
 
   def receive: Receive = {
     case ProcessSingleMeasurement(measurement) =>

@@ -8,10 +8,10 @@ case class ProcessFile()
 case class Measurement(sensorId: String, humidity: Option[Int] = None)
 
 class FileActor(filepath: String) extends Actor {
-  var dataAggregator: Option[ActorRef] = None
-  var sensorActors = scala.collection.mutable.Map.empty[String, ActorRef]
-  var partialComputations = new scala.collection.mutable.ListBuffer[ComputationResult]
-  var receivedPartials = 0
+  private var dataAggregator: Option[ActorRef] = None
+  private val sensorActors = scala.collection.mutable.Map.empty[String, ActorRef]
+  private var partialComputations = new scala.collection.mutable.ListBuffer[ComputationResult]
+  private var receivedPartials = 0
 
   def receive = {
     case ProcessFile() =>

@@ -9,15 +9,25 @@ import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
 object Launcher {
-  val usage = "Usage: java -jar sensors-all.jar [path to directory]\n"
 
   def main(args: Array[String]): Unit = {
+    val app = new Launcher(args)
+    app.run()
+  }
 
+}
+
+
+class Launcher(args: Array[String]) {
+
+  private val usage = "Usage: java -jar sensors-all.jar [path to directory]\n"
+
+  def run() = {
     Utils.parseDirectory(args) match {
       case Success(dataDir) =>
         val system = ActorSystem("System")
         implicit val executionContext = system.dispatcher
-        implicit val timeout = Timeout(60 seconds)
+        implicit val timeout = Timeout(10 minutes)
 
         val futures = ReportFileReader.getReportFilesPaths(dataDir).map { file =>
           val actor = system.actorOf(Props(new FileActor(file.getAbsolutePath)))
@@ -38,17 +48,16 @@ object Launcher {
         println(s"$n\n $usage")
         System.exit(-1)
     }
-
   }
 
-  def printDetails(results: List[ComputationResult], dataDir: String) = {
+  private def printDetails(results: List[ComputationResult], dataDir: String) = {
 
     val header =
-    """
-      |Sensors with highest avg humidity
-      |
-      |sensor-id,min,avg,max
-    """.stripMargin
+      """
+        |Sensors with highest avg humidity
+        |
+        |sensor-id,min,avg,max
+      """.stripMargin
 
     val aggregator = new ComputationAggregator(results)
     val completeResults = aggregator.getSortedFinalResults()

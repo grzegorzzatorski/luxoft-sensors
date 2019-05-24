@@ -10,7 +10,6 @@ object Utils {
     else {
       Success(args(0))
     }
-
   }
 
   def min(first: Option[Int], second: Option[Int]): Option[Int] = (first, second) match {
